@@ -31,7 +31,7 @@ def execute_query(query, api_key_file):
     vectorstore = create_vector_store(documents, embedding_model)
 
     retriever = vectorstore.as_retriever()
-    prompt = ChatPromptTemplate(input_variables=['context', 'question'], messages=[HumanMessagePromptTemplate(prompt=PromptTemplate(input_variables=['context', 'question'], template="You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Otherwise, if the question necessitates a lengthy response, break the answer down step-by-step. If the question is simple, keep the answer concise.\nQuestion: {question} \nContext: {context} \nAnswer:"))])
+    prompt = ChatPromptTemplate(input_variables=['context', 'question'], messages=[HumanMessagePromptTemplate(prompt=PromptTemplate(input_variables=['context', 'question'], template="You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Otherwise, if the question is complex or reqiures background knowledge, break the answer down step-by-step. \nQuestion: {question} \nContext: {context} \nAnswer:"))])
     llm = ChatCohere(model="command-r", cohere_api_key=COHERE_API_KEY)
     rag_chain = (
         {"context": retriever | format_docs, "question": RunnablePassthrough()}

@@ -11,7 +11,7 @@ def google_custom_search(query, api_key, cx):
         "cx": cx,
         "num": 10,  # Number of results you want to retrieve
         "excludeTerms": "site:youtube.com",  # Exclude YouTube videos
-        "sort": "date:20240101:20200101"
+        "sort": "date:20250101:20200101"
     }
     response = requests.get(base_url, params=params)
     links = []

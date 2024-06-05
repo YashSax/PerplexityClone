@@ -2,11 +2,24 @@ import gradio as gr
 from RAG import execute_query
 import requests
 
+DEFAULT_FAVICON_URL = "https://www.nasa.gov/favicon.ico"
+
 
 def get_favicon_url(link):
     from urllib.parse import urlparse
     domain = urlparse(link).netloc
-    return f"https://{domain}/favicon.ico"
+    url = f"https://{domain}/favicon.ico"
+    if favicon_exists(url):
+        return url
+    return DEFAULT_FAVICON_URL
+
+
+def favicon_exists(url):
+    try:
+        response = requests.head(url)
+        return response.status_code == 200
+    except requests.RequestException:
+        return False
 
 
 # Function to simulate a search operation
@@ -62,5 +75,6 @@ with gr.Blocks(css=".output-box { background-color: #1c1c1c; color: white; paddi
     gr.Row([sources_box])
     gr.Row([response_output])
 
-# Launch the Gradio interface
-demo.launch()
+if __name__ == "__main__":
+    # Launch the Gradio interface
+    demo.launch()
