@@ -77,4 +77,4 @@ with gr.Blocks(css=".output-box { background-color: #1c1c1c; color: white; paddi
 
 if __name__ == "__main__":
     # Launch the Gradio interface
-    demo.launch()
+    demo.launch(share=True)
