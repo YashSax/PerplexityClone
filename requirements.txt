@@ -1,0 +1,7 @@
+gradio
+langchain-text-splitters
+langchain-chroma
+langchain-core
+langchain-cohere
+langchain
+beautifulsoup4
