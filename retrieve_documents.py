@@ -19,10 +19,10 @@ def google_custom_search(query, api_key, cx):
         data = response.json()
         if 'items' in data:
             for item in data['items']:
-                print(item['title'])
-                print(item['link'])
-                print(item['snippet'])
-                print()
+                # print(item['title'])
+                # print(item['link'])
+                # print(item['snippet'])
+                # print()
 
                 links.append(item)
         else:
@@ -62,6 +62,9 @@ def retrieve_relevant_documents(query, api_key_file):
         search_api_key = api_keys["google"]["api_key"]
         search_engine_id = api_keys["google"]["search_engine_id"]
     
+    print("Running Google Search")
     links = google_custom_search(query, search_api_key, search_engine_id)
+
+    print("Loading results into Langchain Documents")
     documents = load_langchain_documents(links)
     return documents, links

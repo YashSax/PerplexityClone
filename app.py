@@ -1,9 +1,10 @@
 import gradio as gr
-from RAG import execute_query
+from RAG import get_retriever_links, RAG_with_memory
 import requests
 
+rag_llm = None
+searched = False
 DEFAULT_FAVICON_URL = "https://www.nasa.gov/favicon.ico"
-
 
 def get_favicon_url(link):
     from urllib.parse import urlparse
@@ -21,11 +22,20 @@ def favicon_exists(url):
     except requests.RequestException:
         return False
 
+def chatbot_response(message, history):
+    if not searched:
+        return "Please enter a query above before asking follow-up questions."
+    return rag_llm.generate(message)
 
 # Function to simulate a search operation
 def search(query):
-    # For demonstration purposes, we will just return a mock response
-    response, sources = execute_query(query, "./api_keys.json")
+    global rag_llm
+    global searched
+    searched = True
+
+    retriever, sources = get_retriever_links(query, "./api_keys.json")
+    rag_llm = RAG_with_memory(retriever)
+    response = rag_llm.generate(query)
     
     sources_html = ''.join([
     f"""
@@ -74,6 +84,8 @@ with gr.Blocks(css=".output-box { background-color: #1c1c1c; color: white; paddi
 
     gr.Row([sources_box])
     gr.Row([response_output])
+
+    gr.ChatInterface(chatbot_response, title="Follow-up Questions")
 
 if __name__ == "__main__":
     # Launch the Gradio interface

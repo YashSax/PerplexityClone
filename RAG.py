@@ -10,6 +10,41 @@ from langchain_core.prompts.prompt import PromptTemplate
 import json
 
 
+class RAG_with_memory:
+    def __init__(self, retriever):
+        with open("./RAG_prompt.txt", "r") as f:
+            self.raw_prompt_text = f.read()
+        self.retriever = retriever
+        self.reset()
+
+    def generate(self, query):
+        print("Prompting LLM")
+        prompt_text = self.raw_prompt_text.format(history=self.history, context="{context}", question="{question}")
+        prompt_template = PromptTemplate(
+            input_variables=['context', 'question'],
+            template=prompt_text
+        )
+        rag_chain = (
+            {"context": self.retriever | format_docs, "question": RunnablePassthrough()}
+            | prompt_template
+            | self.llm
+            | StrOutputParser()
+        )
+
+        response = rag_chain.invoke(query)
+        self.history += "Human: " + query + "\n"
+        self.history += "AI: " + response + "\n"
+        
+        return response
+
+    def reset(self):
+        with open("./api_keys.json", "r") as f:
+            api_keys = json.load(f)
+            COHERE_API_KEY = api_keys["cohere"]
+        self.llm = ChatCohere(model="command-r", cohere_api_key=COHERE_API_KEY)
+        self.history = ""
+
+
 def format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)
 
@@ -20,24 +55,13 @@ def create_vector_store(documents, embedding):
     vectorstore = Chroma.from_documents(documents=splits, embedding=embedding)
     return vectorstore
 
-
-def execute_query(query, api_key_file):
+def get_retriever_links(query, api_key_file):
     documents, links = retrieve_relevant_documents(query, api_key_file)
 
-    with open("./api_keys.json", "r") as f: 
+    with open(api_key_file, "r") as f: 
         api_keys = json.load(f)
         COHERE_API_KEY = api_keys["cohere"]
     embedding_model = CohereEmbeddings(cohere_api_key=COHERE_API_KEY)
+    print("Splitting Documents + Loading into vectorstore")
     vectorstore = create_vector_store(documents, embedding_model)
-
-    retriever = vectorstore.as_retriever()
-    prompt = ChatPromptTemplate(input_variables=['context', 'question'], messages=[HumanMessagePromptTemplate(prompt=PromptTemplate(input_variables=['context', 'question'], template="You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Otherwise, if the question is complex or reqiures background knowledge, break the answer down step-by-step. \nQuestion: {question} \nContext: {context} \nAnswer:"))])
-    llm = ChatCohere(model="command-r", cohere_api_key=COHERE_API_KEY)
-    rag_chain = (
-        {"context": retriever | format_docs, "question": RunnablePassthrough()}
-        | prompt
-        | llm
-        | StrOutputParser()
-    )
-
-    return rag_chain.invoke(query), links
+    return vectorstore.as_retriever(), links
