@@ -11,13 +11,52 @@ import json
 
 
 class RAG_with_memory:
-    def __init__(self, retriever):
-        with open("./RAG_prompt.txt", "r") as f:
+    def __init__(self, retriever=None):
+        with open("./prompts/search.txt", "r") as f:
             self.raw_prompt_text = f.read()
+        with open("./prompts/rewrite_query.txt", "r") as f:
+            self.raw_query_rewrite_text = f.read()
         self.retriever = retriever
         self.reset()
+    
+    def load_history(self, history):
+        self.history = ""
+        for item in history:
+            if item["role"] == "user":
+                self.history += "Human: " + item["content"] + "\n"
+            else:
+                self.history += "AI: " + item["content"] + "\n"
+        self.history += "\n"
+
+    def add_retriever(self, retriever):
+        self.retriever = retriever
+    
+    def reset(self):
+        with open("./api_keys.json", "r") as f:
+            api_keys = json.load(f)
+            COHERE_API_KEY = api_keys["cohere"]
+        self.llm = ChatCohere(model="command-r", cohere_api_key=COHERE_API_KEY)
+        self.history = ""
+
+    def rewrite_query(self, original_query):
+        print("Rewriting query")
+        prompt_text = self.raw_query_rewrite_text.format(history=self.history, query="{query}")
+        prompt_template = PromptTemplate(
+            input_variables=['query'],
+            template=prompt_text
+        )
+        chain = (
+            {"query" : RunnablePassthrough()}
+            | prompt_template
+            | self.llm
+            | StrOutputParser()
+        )
+        return chain.invoke(original_query)
 
     def generate(self, query):
+        # TODO: Generate should take a retriever, not constructor
+        if self.retriever is None:
+            raise Exception("Retriever must non-None")
         print("Prompting LLM")
         prompt_text = self.raw_prompt_text.format(history=self.history, context="{context}", question="{question}")
         prompt_template = PromptTemplate(
@@ -34,15 +73,8 @@ class RAG_with_memory:
         response = rag_chain.invoke(query)
         self.history += "Human: " + query + "\n"
         self.history += "AI: " + response + "\n"
-        
+        print("Done")
         return response
-
-    def reset(self):
-        with open("./api_keys.json", "r") as f:
-            api_keys = json.load(f)
-            COHERE_API_KEY = api_keys["cohere"]
-        self.llm = ChatCohere(model="command-r", cohere_api_key=COHERE_API_KEY)
-        self.history = ""
 
 
 def format_docs(docs):

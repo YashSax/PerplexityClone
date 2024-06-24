@@ -9,7 +9,7 @@ def google_custom_search(query, api_key, cx):
         "q": query,
         "key": api_key,
         "cx": cx,
-        "num": 10,  # Number of results you want to retrieve
+        "num": 5,  # Number of results you want to retrieve
         "excludeTerms": "site:youtube.com",  # Exclude YouTube videos
         "sort": "date:20250101:20200101"
     }
