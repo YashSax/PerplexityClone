@@ -7,6 +7,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.prompts.chat import HumanMessagePromptTemplate
 from langchain_core.prompts.prompt import PromptTemplate
 import json
+import pathlib
 
 __import__('pysqlite3')
 import sys
@@ -15,9 +16,10 @@ from langchain_chroma import Chroma
 
 class RAG_with_memory:
     def __init__(self, retriever=None):
-        with open("./prompts/search.txt", "r") as f:
+        file_loc = pathlib.Path(__file__).parent.resolve()
+        with open(file_loc / "prompts/search.txt", "r") as f:
             self.raw_prompt_text = f.read()
-        with open("./prompts/rewrite_query.txt", "r") as f:
+        with open(file_loc / "prompts/rewrite_query.txt", "r") as f:
             self.raw_query_rewrite_text = f.read()
         self.retriever = retriever
         self.reset()
