@@ -2,6 +2,8 @@
 
 Demo: [https://huggingface.co/spaces/YashSax/PerplexityClone](https://huggingface.co/spaces/YashSax/PerplexityClone)
 
+Chat Version Demo (multi-turn + retrieval for each step + query rewrite): [Google Drive Link](https://drive.google.com/file/d/1LCS4RdyI46WhfJabGGkIrgFJFWZq7cDK/view)
+
 A clone of [perplexity.ai](perplexity.ai), an LLM and RAG-powered search engine using LangChain, Chroma Vector Store, and Cohere Text Generation and Embedding Models. Frontend designed using Gradio.
 
 ![image](https://github.com/YashSax/PerplexityClone/assets/46911428/014076e5-fa74-4821-b0b0-2298b3a89205)
