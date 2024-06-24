@@ -1,6 +1,5 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from retrieve_documents import retrieve_relevant_documents
-from langchain_chroma import Chroma
 from langchain_cohere import ChatCohere, CohereEmbeddings
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
@@ -12,6 +11,7 @@ import json
 __import__('pysqlite3')
 import sys
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+from langchain_chroma import Chroma
 
 class RAG_with_memory:
     def __init__(self, retriever=None):
