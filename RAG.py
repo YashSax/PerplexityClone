@@ -16,10 +16,10 @@ from langchain_chroma import Chroma
 
 class RAG_with_memory:
     def __init__(self, retriever=None):
-        file_loc = pathlib.Path(__file__).parent.resolve()
-        with open(file_loc / "prompts/search.txt", "r") as f:
+        self.file_loc = pathlib.Path(__file__).parent.resolve()
+        with open(self.file_loc / "prompts/search.txt", "r") as f:
             self.raw_prompt_text = f.read()
-        with open(file_loc / "prompts/rewrite_query.txt", "r") as f:
+        with open(self.file_loc / "prompts/rewrite_query.txt", "r") as f:
             self.raw_query_rewrite_text = f.read()
         self.retriever = retriever
         self.reset()
@@ -37,7 +37,7 @@ class RAG_with_memory:
         self.retriever = retriever
     
     def reset(self):
-        with open("./api_keys.json", "r") as f:
+        with open(self.file_loc / "api_keys.json", "r") as f:
             api_keys = json.load(f)
             COHERE_API_KEY = api_keys["cohere"]
         self.llm = ChatCohere(model="command-r", cohere_api_key=COHERE_API_KEY)
