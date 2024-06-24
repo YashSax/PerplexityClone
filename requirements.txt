@@ -5,3 +5,4 @@ langchain-core
 langchain-cohere
 langchain
 beautifulsoup4
+pysqlite-binary

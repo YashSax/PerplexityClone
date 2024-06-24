@@ -9,6 +9,9 @@ from langchain_core.prompts.chat import HumanMessagePromptTemplate
 from langchain_core.prompts.prompt import PromptTemplate
 import json
 
+__import__('pysqlite3')
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 class RAG_with_memory:
     def __init__(self, retriever=None):
