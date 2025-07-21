@@ -1,7 +1,5 @@
 # PerplexityClone
 
-Demo: [https://huggingface.co/spaces/YashSax/PerplexityClone](https://huggingface.co/spaces/YashSax/PerplexityClone)
-
 Chat Version Demo (multi-turn + retrieval for each step + query rewrite): [Google Drive Link](https://drive.google.com/file/d/1LCS4RdyI46WhfJabGGkIrgFJFWZq7cDK/view)
 
 🎥 **Video Walkthrough**:  
